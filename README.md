@@ -1,4 +1,4 @@
-# B546X Unix Assignment
+#B546X Unix Assignment
 
 ## File Inspection
 
@@ -166,4 +166,39 @@
 - Make the unknown SNP file: `awk '$3 ~/unknown|Position/ { print $0 }' teosinte_joined.txt > unknown_pos_teosinte.txt`
 
 
+
 - Make the multiple position SNP file: `awk '$3 ~/multiple|Position/ { print $0 }' teosinte_joined.txt > multiple_pos_teosinte.txt`
+
+6) Tidy files:
+- Create a directory for the original data and move the original files there:
+
+		mkdir original_data
+		cp snp_position.txt original_data/
+		cp fang_et_al_genotypes.txt original_data/
+		rm fang_et_al_genotypes.txt
+		rm snp_positions.txt
+		
+- Create a directory for the output data and move output files there:
+
+		mkdir output
+		cp chr??_??creasing_*.txt output/
+		cp chr?_??creasing_*.txt output/
+		cp unknown_pos_*.txt output/
+		cp multiple_pos_*.txt output/
+		rm chr??_??creasing_*.txt
+		rm chr?_??creasing_*.txt
+		rm unknown_pos_*.txt
+		rm multiple_pos_*.txt
+
+		
+-Create a directory for intermediate files and move those files there:
+		
+		mkdir intermediate_files
+		cp sorted_*.txt intermediate_files/		
+		cp transposed_*.txt intermediate_files/
+		cp teosinte_*.txt intermediate_files/
+		cp maize_*.txt intermediate_files/
+		rm sorted_*.txt 		
+		rm transposed_*.txt 
+		rm teosinte_*.txt 
+		rm maize_*.txt 
