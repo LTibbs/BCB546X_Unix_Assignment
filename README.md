@@ -191,7 +191,7 @@
 		rm multiple_pos_*.txt
 
 		
--Create a directory for intermediate files and move those files there:
+- Create a directory for intermediate files and move those files there:
 		
 		mkdir intermediate_files
 		cp sorted_*.txt intermediate_files/		
