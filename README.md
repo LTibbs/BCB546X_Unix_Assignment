@@ -136,6 +136,7 @@
 
 	- As above, this code uses a `for` loop to work on all chromosomes, `awk` to extract SNPs, and `sort` to sort the output.
 	- However, it uses `-r` to sort the SNPs by decreasing position rather than increasing.
+	- SNPs with multiple positions are sorted to the bottom of the file.
 	- In order to code all missing data as `-` (previously coded as `?`), use `sed` to find `?` and replace it with `-` wherever it occurs.
 	- Again, write output to a file.
 	- Finally, check that the process was successful as above, using `cut -f2 maize_joined.txt | sort -k1,1n | uniq -c` to examine the input file and `for i in {1..10}; do wc -l chr"$i"_decreasing_maize.txt; done` to examine the output.
