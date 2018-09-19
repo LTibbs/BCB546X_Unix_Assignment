@@ -40,7 +40,7 @@
 
 `head -2 snp_position.txt | column -t`
 
-- This shows the columns described above that I saw using `less` and `head`, more in a more readable way so that it is much more obvious to see which value aligns with which column heading. 
+- This shows the columns described above that I saw using `less` and `head`, in a more readable way so that it is much more obvious to see which value aligns with which column heading. 
 
 
 5) Use `wc` to find number of lines, words, and characters in these files:
@@ -100,7 +100,7 @@
 
 	- Finally, these lines of code check that the total numbers of lines in the output files are as expected: 975 teosinte lines and 1573 maize lines, plus 1 record for the header in each file.
 
-2) Transpose the teosinte and maize genotype data using provided `teosinte.awk`:
+2) Transpose the teosinte and maize genotype data using provided `transpose.awk`:
 
 `awk -f transpose.awk teosinte_genotypes.txt > transposed_teosinte_genotypes.txt` and `awk -f transpose.awk maize_genotypes.txt > transposed_maize_genotypes.txt`
 	
@@ -124,10 +124,11 @@
 `for i in {1..10}; do ( head -1 maize_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' maize_joined.txt | sort -k3,3n) > chr"$i"_increasing_maize.txt; done`
 
 	- The code above uses a `for` loop to loop through all the chromosomes. 
-	-  Within the loop, use a subshell to first extract the header data from the full data set. 
-	-  Then, use `awk` to extract all SNPs from the given chromosome (in column `2`; use `'$i'` to pass awk the variable represented by `i` and use `^` and `$` to make sure that `i` matches the whole field and not just part of it) and `sort` this data by increasing SNP position (in column `3`), which is numeric (use `-n`).
-	-  SNPs with multiple positions are sorted to the top of the file. 
-	-  SNPs with unknown positions are not included because their chromosome is not known. 
+	-  Within the loop, use a subshell to:
+		- First extract the header data from the full data set. 
+		-  Then, use `awk` to extract all SNPs from the given chromosome (in column `2`; use `'$i'` to pass awk the variable represented by `i` and use `^` and `$` to make sure that `i` matches the whole field and not just part of it) and `sort` this data by increasing SNP position (in column `3`), which is numeric (use `-n`).
+		-  SNPs with multiple positions are sorted to the top of the file. 
+		-  SNPs with unknown positions are not included because their chromosome is not known. 
 	-  Nothing has to be done to change the missing data because it is already encoded as `?`. 
 	-  Finally, write the output to a file. 
 	- Now, check that this process was successful by checking the number of SNPs in each chromosome in the original file using `cut -f2 maize_joined.txt | sort -k1,1n | uniq -c` and make sure these match the size of the output files (plus one line for the header) using `for i in {1..10}; do wc -l chr"$i"_increasing_maize.txt; done` .
@@ -165,7 +166,6 @@
 		for i in {1..10}; do wc -l chr"$i"_decreasing_teosinte.txt; done
 
 - Make the unknown SNP file: `awk '$3 ~/unknown|Position/ { print $0 }' teosinte_joined.txt > unknown_pos_teosinte.txt`
-
 
 
 - Make the multiple position SNP file: `awk '$3 ~/multiple|Position/ { print $0 }' teosinte_joined.txt > multiple_pos_teosinte.txt`
