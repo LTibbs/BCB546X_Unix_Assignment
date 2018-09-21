@@ -121,26 +121,31 @@
 4) Now that we have a full, joined dataset for both maize and teosinte, create the desired output files for maize.
 
 - Make 1 file for each chromosome with SNPs ordered by increasing position and with missing data encoded as "?" (this is already how missing data is encoded): 
-`for i in {1..10}; do ( head -1 maize_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' maize_joined.txt | sort -k3,3n) > chr"$i"_increasing_maize.txt; done`
+`for i in {1..10}; do ( head -1 maize_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' maize_joined.txt | sort -k3,3n) > pre_chr"$i"_increasing_maize.txt; done`
 
 	- The code above uses a `for` loop to loop through all the chromosomes. 
 	-  Within the loop, use a subshell to:
 		- First extract the header data from the full data set. 
 		-  Then, use `awk` to extract all SNPs from the given chromosome (in column `2`; use `'$i'` to pass awk the variable represented by `i` and use `^` and `$` to make sure that `i` matches the whole field and not just part of it) and `sort` this data by increasing SNP position (in column `3`), which is numeric (use `-n`).
-		-  SNPs with multiple positions are sorted to the top of the file. 
-		-  SNPs with unknown positions are not included because their chromosome is not known. 
+		- SNPs with unknown positions are not included because their chromosome is not known.
+	- Now, check that this process was successful by checking the number of SNPs in each chromosome in the original file using `cut -f2 maize_joined.txt | sort -k1,1n | uniq -c` and make sure these match the size of the output files (plus one line for the header) using `for i in {1..10}; do wc -l pre_chr"$i"_increasing_maize.txt; done` .
+	-  Also, use `awk` to exclude SNPs with multiple positions, excluding lines with `multiple` in column 3 (as instructed in Slack scripting_help):
+		- ` for i in {1..10}; do ( awk '$3 !~/multiple/ { print $0 }' pre_chr"$i"_increasing_maize.txt) > chr"$i"_increasing_maize.txt; done `
 	-  Nothing has to be done to change the missing data because it is already encoded as `?`. 
-	-  Finally, write the output to a file. 
-	- Now, check that this process was successful by checking the number of SNPs in each chromosome in the original file using `cut -f2 maize_joined.txt | sort -k1,1n | uniq -c` and make sure these match the size of the output files (plus one line for the header) using `for i in {1..10}; do wc -l chr"$i"_increasing_maize.txt; done` .
+	-  The final step in the code is to write the output to a file. 
+	
 
-- Make 1 file for each chromosome with SNPs ordered by decreasing position and with missing data encoded as `-`: `for i in {1..10}; do ( head -1 maize_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' maize_joined.txt | sort -k3,3nr | sed s/?/-/g) > chr"$i"_decreasing_maize.txt; done`
+- Make 1 file for each chromosome with SNPs ordered by decreasing position and with missing data encoded as `-`: `for i in {1..10}; do ( head -1 maize_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' maize_joined.txt | sort -k3,3nr | sed s/?/-/g) > pre_chr"$i"_decreasing_maize.txt; done`
 
 	- As above, this code uses a `for` loop to work on all chromosomes, `awk` to extract SNPs, and `sort` to sort the output.
 	- However, it uses `-r` to sort the SNPs by decreasing position rather than increasing.
-	- SNPs with multiple positions are sorted to the bottom of the file.
 	- In order to code all missing data as `-` (previously coded as `?`), use `sed` to find `?` and replace it with `-` wherever it occurs.
 	- Again, write output to a file.
-	- Finally, check that the process was successful as above, using `cut -f2 maize_joined.txt | sort -k1,1n | uniq -c` to examine the input file and `for i in {1..10}; do wc -l chr"$i"_decreasing_maize.txt; done` to examine the output.
+	- Check that the process was successful as above, using `cut -f2 maize_joined.txt | sort -k1,1n | uniq -c` to examine the input file and `for i in {1..10}; do wc -l pre_chr"$i"_decreasing_maize.txt; done` to examine the output.
+	-  Also, use `awk` to exclude SNPs with multiple positions, excluding lines with `multiple` in column 3 (as instructed in Slack scripting_help):
+		- ` for i in {1..10}; do ( awk '$3 !~/multiple/ { print $0 }' pre_chr"$i"_decreasing_maize.txt) > chr"$i"_decreasing_maize.txt; done `
+	
+	
 
 - Make 1 file with all SNPs with unknown positions in the genome: `awk '$3 ~/unknown|Position/ { print $0 }' maize_joined.txt > unknown_pos_maize.txt`
 	- This code uses `awk` to extract all SNPs with unknown positions, as well as the header row, and print this to an output file
@@ -152,18 +157,21 @@
 
 - Make and check the first set of ten output files:
 
-		for i in {1..10}; do ( head -1 teosinte_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' teosinte_joined.txt | sort -k3,3n) > chr"$i"_increasing_teosinte.txt; done`
-
-		cut -f2 teosinte_joined.txt | sort -k1,1n | uniq -c
-
-		for i in {1..10}; do wc -l chr"$i"_increasing_teosinte.txt; done
+	```
+	for i in {1..10}; do ( head -1 teosinte_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' teosinte_joined.txt | sort -k3,3n) > pre_chr"$i"_increasing_teosinte.txt; done`
+	cut -f2 teosinte_joined.txt | sort -k1,1n | uniq -c
+	for i in {1..10}; do wc -l pre_chr"$i"_increasing_teosinte.txt; done
+	for i in {1..10}; do ( awk '$3 !~/multiple/ { print $0 }' pre_chr"$i"_increasing_teosinte.txt) > chr"$i"_increasing_teosinte.txt; done
+	```
 
 - Make and check the next set of ten output files:
 
-		for i in {1..10}; do ( head -1 teosinte_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' teosinte_joined.txt | sort -k3,3nr | sed s/?/-/g) > chr"$i"_decreasing_teosinte.txt; done
-
-		cut -f2 teosinte_joined.txt | sort -k1,1n | uniq -c
-		for i in {1..10}; do wc -l chr"$i"_decreasing_teosinte.txt; done
+	```
+	for i in {1..10}; do ( head -1 teosinte_joined.txt; awk '$2 ~/^'$i'$/ { print $0 }' teosinte_joined.txt | sort -k3,3nr | sed s/?/-/g) > pre_chr"$i"_decreasing_teosinte.txt; done
+	cut -f2 teosinte_joined.txt | sort -k1,1n | uniq -c
+	for i in {1..10}; do wc -l pre_chr"$i"_decreasing_teosinte.txt; done
+	for i in {1..10}; do ( awk '$3 !~/multiple/ { print $0 }' pre_chr"$i"_decreasing_teosinte.txt) > chr"$i"_decreasing_teosinte.txt; done
+	```
 
 - Make the unknown SNP file: `awk '$3 ~/unknown|Position/ { print $0 }' teosinte_joined.txt > unknown_pos_teosinte.txt`
 
@@ -199,7 +207,9 @@
 		cp transposed_*.txt intermediate_files/
 		cp teosinte_*.txt intermediate_files/
 		cp maize_*.txt intermediate_files/
+		cp pre_chr*.txt intermediate_files/
 		rm sorted_*.txt 		
 		rm transposed_*.txt 
 		rm teosinte_*.txt 
 		rm maize_*.txt 
+		rm pre_chr*.txt
